@@ -1,0 +1,2 @@
+
+export const CODE_AGENT_MAX_ITERATIONS = 2;

@@ -11,6 +11,8 @@ import { getSandBox, lastAssistantTextMessageContent } from "./utils";
 import z from "zod";
 import { PROMPT } from "@/prompt";
 import prisma from "@/lib/db";
+import { CODE_AGENT_MAX_ITERATIONS } from "@/constant";
+
 
 interface AgentState {
   summary: string;
@@ -76,7 +78,10 @@ export const codeAgentFunction = inngest.createFunction(
               })
             ),
           }),
-          handler: async ({ files }, { step, network }: Tool.Options<AgentState>) => {
+          handler: async (
+            { files },
+            { step, network }: Tool.Options<AgentState>
+          ) => {
             const newFiles = await step?.run(
               "createOrUpdateFiles",
               async () => {
@@ -142,7 +147,7 @@ export const codeAgentFunction = inngest.createFunction(
     const network = createNetwork<AgentState>({
       name: "coding-agent-network",
       agents: [codeAgent],
-      maxIter: 10,
+      maxIter: CODE_AGENT_MAX_ITERATIONS,
       router: async ({ network }) => {
         const summary = network.state.data.summary;
         if (summary) {
