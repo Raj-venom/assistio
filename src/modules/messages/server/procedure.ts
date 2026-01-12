@@ -7,12 +7,17 @@ export const messagesRouter = createTRPCRouter({
   create: baseProcedure
     .input(
       z.object({
-        prompt: z.string().min(1, { message: "Prompt is required" }),
+        prompt: z
+          .string()
+          .min(1, { message: "Prompt is required" })
+          .max(1000, { message: "Prompt must be at most 1000 characters" }),
+        projectId: z.string().min(1, { message: "Project ID is required" }),
       })
     )
     .mutation(async ({ input }) => {
       const newMessage = await prisma.message.create({
         data: {
+          projectId: input.projectId,
           content: input.prompt,
           role: "USER",
           type: "RESULT",
@@ -21,19 +26,26 @@ export const messagesRouter = createTRPCRouter({
 
       await inngest.send({
         name: "code-agent/run",
-        data: { prompt: input.prompt },
+        data: { prompt: input.prompt, projectId: input.projectId },
       });
 
       return newMessage;
     }),
 
-  getMany: baseProcedure.query(async () => {
-    const messages = await prisma.message.findMany({
-      orderBy: { createdAt: "desc" },
-      include: {
-        fragment: true,
-      },
-    });
-    return messages;
-  }),
+  getMany: baseProcedure
+    .input(
+      z.object({
+        projectId: z.string().min(1, { message: "Project ID is required" }),
+      })
+    )
+    .query(async ({ input }) => {
+      const messages = await prisma.message.findMany({
+        where: { projectId: input.projectId },
+        orderBy: { createdAt: "asc" },
+        include: {
+          fragment: true,
+        },
+      });
+      return messages;
+    }),
 });

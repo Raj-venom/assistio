@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "inngest:dev": "npx --ignore-scripts=false inngest-cli@latest dev"
+    "inngest:dev": "npx --ignore-scripts=false inngest-cli@latest dev",
+    "prisma:studio": "prisma studio"
   },
   "dependencies": {
     "@e2b/code-interpreter": "^2.3.3",
@@ -61,7 +62,8 @@
     "react-day-picker": "^9.13.0",
     "react-dom": "19.2.3",
     "react-hook-form": "^7.69.0",
-    "react-resizable-panels": "^4.1.0",
+    "react-resizable-panels": "1.0.9",
+    "react-textarea-autosize": "^8.5.9",
     "recharts": "2.15.4",
     "server-only": "^0.0.1",
     "sonner": "^2.0.7",

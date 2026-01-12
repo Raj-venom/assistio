@@ -11,6 +11,7 @@ import { getSandBox, lastAssistantTextMessageContent } from "./utils";
 import z from "zod";
 import { PROMPT } from "@/prompt";
 import prisma from "@/lib/db";
+import { CODE_AGENT_MAX_ITERATIONS } from "@/constant";
 
 interface AgentState {
   summary: string;
@@ -76,7 +77,10 @@ export const codeAgentFunction = inngest.createFunction(
               })
             ),
           }),
-          handler: async ({ files }, { step, network }: Tool.Options<AgentState>) => {
+          handler: async (
+            { files },
+            { step, network }: Tool.Options<AgentState>
+          ) => {
             const newFiles = await step?.run(
               "createOrUpdateFiles",
               async () => {
@@ -142,7 +146,7 @@ export const codeAgentFunction = inngest.createFunction(
     const network = createNetwork<AgentState>({
       name: "coding-agent-network",
       agents: [codeAgent],
-      maxIter: 10,
+      maxIter: CODE_AGENT_MAX_ITERATIONS,
       router: async ({ network }) => {
         const summary = network.state.data.summary;
         if (summary) {
@@ -154,9 +158,19 @@ export const codeAgentFunction = inngest.createFunction(
 
     const result = await network.run(event.data.prompt);
 
+    console.log("Final Agent State:", result.state.data);
+    console.log("------------------------");
+    console.log("summary:", !result.state.data.summary);
+    console.log(
+      "Files Generated:",
+      Object.keys(result.state.data.files || {}).length === 0
+    );
+
     const isError =
       !result.state.data.summary ||
       Object.keys(result.state.data.files || {}).length === 0;
+
+    console.log("isError:", isError);
 
     const sandboxUrl = await step.run("get-sandbox-url", async () => {
       const sandbox = await getSandBox(sandboxId);
@@ -168,6 +182,7 @@ export const codeAgentFunction = inngest.createFunction(
       if (isError) {
         return await prisma.message.create({
           data: {
+            projectId: event.data.projectId,
             content: "The agent failed to generate code. Please try again.",
             role: "ASSISTANT",
             type: "ERROR",
@@ -177,6 +192,7 @@ export const codeAgentFunction = inngest.createFunction(
 
       return await prisma.message.create({
         data: {
+          projectId: event.data.projectId,
           content: result.state.data.summary,
           role: "ASSISTANT",
           type: "RESULT",
