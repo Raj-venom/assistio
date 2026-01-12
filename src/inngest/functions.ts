@@ -13,7 +13,6 @@ import { PROMPT } from "@/prompt";
 import prisma from "@/lib/db";
 import { CODE_AGENT_MAX_ITERATIONS } from "@/constant";
 
-
 interface AgentState {
   summary: string;
   files: { [path: string]: string };
@@ -159,9 +158,19 @@ export const codeAgentFunction = inngest.createFunction(
 
     const result = await network.run(event.data.prompt);
 
+    console.log("Final Agent State:", result.state.data);
+    console.log("------------------------");
+    console.log("summary:", !result.state.data.summary);
+    console.log(
+      "Files Generated:",
+      Object.keys(result.state.data.files || {}).length === 0
+    );
+
     const isError =
       !result.state.data.summary ||
       Object.keys(result.state.data.files || {}).length === 0;
+
+    console.log("isError:", isError);
 
     const sandboxUrl = await step.run("get-sandbox-url", async () => {
       const sandbox = await getSandBox(sandboxId);
