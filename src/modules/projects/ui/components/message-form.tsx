@@ -21,6 +21,7 @@ interface MessageFormProps {
 const messageFormSchema = z.object({
     prompt: z
         .string()
+        .trim()
         .min(1, { message: "Prompt is required" })
         .max(1000, { message: "Prompt must be at most 1000 characters" }),
 });
@@ -52,7 +53,7 @@ export default function MessageForm({ projectId }: MessageFormProps) {
 
     const onSubmit = async (data: z.infer<typeof messageFormSchema>) => {
         await createMessage.mutateAsync({
-            prompt: data.prompt,
+            prompt: data.prompt.trim(),
             projectId,
         })
     };
