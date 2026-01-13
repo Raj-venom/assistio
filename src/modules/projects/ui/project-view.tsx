@@ -10,12 +10,18 @@ import { Fragment } from "@/generated/prisma/client";
 import { ProjectHeader } from "./components/project-header";
 import { FragmentWeb } from "./components/fragment-web";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CodeIcon, CrownIcon, EyeIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
 interface Props {
   projectId: string;
 }
 
 export const ProjectView = ({ projectId }: Props) => {
   const [activeFragment, setActiveFragment] = useState<Fragment | null>(null);
+  const [tabState, setTabState] = useState<"preview" | "code">("preview");
 
   return (
     <div className="h-screen">
@@ -38,7 +44,36 @@ export const ProjectView = ({ projectId }: Props) => {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={75} minSize={50}>
-          {activeFragment && <FragmentWeb  data={activeFragment} />}
+          <Tabs
+            className="h-full gap-y-0"
+            defaultValue="preview"
+            value={tabState}
+            onValueChange={(value) => setTabState(value as "preview" | "code")}
+          >
+            <div className="w-full flex items-center p-2 border gap-x-2">
+              <TabsList className="h-8 p-0 border rounded-md">
+                <TabsTrigger value="preview" className="rounded-md">
+                  <EyeIcon /> <span>Preview</span>
+                </TabsTrigger>
+                <TabsTrigger value="code" className="rounded-md">
+                  <CodeIcon /> <span>Code</span>
+                </TabsTrigger>
+              </TabsList>
+              <div className="ml-auto flex items-center gap-x-2">
+                <Button size="sm" variant="default" asChild>
+                  <Link href="/pricing">
+                    <CrownIcon /> Upgrade
+                  </Link>
+                </Button>
+              </div>
+            </div>
+            <TabsContent value="preview">
+              {!!activeFragment && <FragmentWeb data={activeFragment} />}
+            </TabsContent>
+            <TabsContent value="code">
+              <p>Todo: code</p>
+            </TabsContent>
+          </Tabs>
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
