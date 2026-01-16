@@ -32,7 +32,7 @@ export const MessagesContainer = ({
       (message) => message.role === MessageRole.ASSISTANT
     );
 
-    if (lastAssistantMessage?.fragment && lastAssistantMessage.id === lastAssistantMessageRef.current) {
+    if (lastAssistantMessage?.fragment && lastAssistantMessage.id !== lastAssistantMessageRef.current) {
       setActiveFragment(lastAssistantMessage.fragment);
       lastAssistantMessageRef.current = lastAssistantMessage.id;
     }
