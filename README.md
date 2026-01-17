@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Full-Stack App Generator ⚡
 
-## Getting Started
+Generate **full-stack applications** from simple prompts using **programmable AI agents** powered by **Inngest**.  
+AI models handle code generation while applications are executed securely inside **cloud sandboxes** using **E2B** and **Docker**.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Overview
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This project enables developers to go from **idea → running application** in minutes.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Describe your app using a prompt
+- AI agents generate components, APIs, and database logic
+- Code runs in isolated cloud sandboxes
+- Get a live preview with a shareable URL
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Built for rapid prototyping, experimentation, and AI-driven development workflows.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Frontend
+- **Next.js 16**
+- **React 19**
+- **Tailwind CSS v4**
+- **shadcn/ui**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Backend & Infrastructure
+- **tRPC** – End-to-end type safety
+- **Inngest** – Background jobs & workflow orchestration
+- **Inngest Agent Toolkit** – Programmable AI agents
+- **Prisma** – ORM
+- **Neon** – Serverless PostgreSQL
 
-## Deploy on Vercel
+### Runtime & Execution
+- **E2B Cloud Sandboxes** – Secure runtime execution
+- **Docker** – Sandbox templating & isolation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### AI
+- AI model support for:
+  - Component generation
+  - Full app scaffolding
+  - API and business logic generation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🧠 Key Features
+
+- 🧱 **Component & App Generation**  
+  Generate complete applications or individual components from AI prompts.
+
+- 🧠 **Programmable AI Agents**  
+  AI agents coordinate code generation, execution, and validation using Inngest.
+
+- 🔁 **Background Job Processing**  
+  Reliable execution of long-running tasks via Inngest workflows.
+
+- 🗂️ **Live Project Preview**  
+  Instantly preview generated projects with a public URL.
+
+- 🖥️ **Secure Cloud Sandboxes**  
+  Each app runs inside an isolated E2B environment.
+
+- 🐳 **Docker-Based Templates**  
+  Reusable Docker templates ensure consistent execution environments.
+
+- 📦 **Database Integration**  
+  Prisma + Neon for scalable and serverless database support.
+
+---
+
+## 🏗️ Architecture
+
+```text
+Prompt → AI Agent → Code Generation → Sandbox Execution → Live Preview
+                ↳ Inngest Workflows
