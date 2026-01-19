@@ -16,6 +16,7 @@ import { Form, FormField } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { PROJECT_TEMPLATES } from "../../constant";
+import { enhancePromptWithGemini } from "@/hooks/call-llm";
 
 const projectFormSchema = z.object({
   prompt: z
@@ -45,13 +46,27 @@ export default function ProjectForm() {
       onError: (error) => {
         toast.error(`${error.message}`);
       },
-    })
+    }),
   );
 
   const onSubmit = async (data: z.infer<typeof projectFormSchema>) => {
     await createProject.mutateAsync({
       prompt: data.prompt.trim(),
     });
+  };
+
+  const handleInhancePrompt = (data: z.infer<typeof projectFormSchema>) => {
+    enhancePromptWithGemini(data.prompt)
+      .then((enhancedPrompt) => {
+        form.setValue("prompt", enhancedPrompt, {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        });
+      })
+      .catch((error) => {
+        toast.error(`Failed to enhance prompt: ${error.message}`);
+      });
   };
 
   const [isFocused, setIsFocused] = useState(false);
@@ -65,7 +80,7 @@ export default function ProjectForm() {
           onSubmit={form.handleSubmit(onSubmit)}
           className={cn(
             "relative border p-4 pt-1 rounded-xl bg-sidebar dark:bg-sidebar transition-all ",
-            isFocused && "shadow-xs"
+            isFocused && "shadow-xs",
           )}
         >
           <FormField
@@ -97,19 +112,31 @@ export default function ProjectForm() {
               </kbd>
               &nbsp;to submit
             </div>
-            <Button
-              className={cn(
-                "size-8 rounded-full",
-                isButtonDisabled && "bg-muted-foreground border"
-              )}
-              disabled={isButtonDisabled}
-            >
-              {isPending ? (
-                <Loader2Icon className="size-4 animate-spin" />
-              ) : (
-                <ArrowUpIcon />
-              )}
-            </Button>
+
+            <div className="flex items-center justify-center" >
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleInhancePrompt(form.getValues())}
+                type="button"
+              >
+              ✨ Enhance
+              </Button>
+
+              <Button
+                className={cn(
+                  "size-8 rounded-full",
+                  isButtonDisabled && "bg-muted-foreground border",
+                )}
+                disabled={isButtonDisabled}
+              >
+                {isPending ? (
+                  <Loader2Icon className="size-4 animate-spin" />
+                ) : (
+                  <ArrowUpIcon />
+                )}
+              </Button>
+            </div>
           </div>
         </form>
         <div className="flex-wrap justify-center gap-2 hidden md:flex max-w-3xl">
@@ -119,12 +146,11 @@ export default function ProjectForm() {
               variant="outline"
               size="sm"
               onClick={() => {
-                form.setValue("prompt", template.prompt,{
-                    shouldDirty: true,
-                    shouldTouch: true,
-                    shouldValidate: true,
+                form.setValue("prompt", template.prompt, {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                  shouldValidate: true,
                 });
-               
               }}
             >
               {template.emoji} {template.title}
