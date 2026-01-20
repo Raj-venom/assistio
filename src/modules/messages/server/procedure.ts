@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { inngest } from "@/inngest/client";
-import { createTRPCRouter, baseProcedure } from "@/trpc/init";
+import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import prisma from "@/lib/db";
 
 export const messagesRouter = createTRPCRouter({
-  create: baseProcedure
+  create: protectedProcedure
     .input(
       z.object({
         prompt: z
@@ -12,7 +12,7 @@ export const messagesRouter = createTRPCRouter({
           .min(1, { message: "Prompt is required" })
           .max(1000, { message: "Prompt must be at most 1000 characters" }),
         projectId: z.string().min(1, { message: "Project ID is required" }),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const newMessage = await prisma.message.create({
@@ -32,11 +32,11 @@ export const messagesRouter = createTRPCRouter({
       return newMessage;
     }),
 
-  getMany: baseProcedure
+  getMany: protectedProcedure
     .input(
       z.object({
         projectId: z.string().min(1, { message: "Project ID is required" }),
-      })
+      }),
     )
     .query(async ({ input }) => {
       const messages = await prisma.message.findMany({
