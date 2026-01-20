@@ -15,10 +15,10 @@ export const ProjectsList = () => {
     <div className="w-full bg-white dark:bg-sidebar rounded-xl p-8 border flex flex-col gap-y-6 sm:gap-y-4">
       <h2 className="text-2xl font-semibold">Your Projects</h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        {projects?.length === 0 && (
+        {!projects?.length && (
           <div className="col-span-full text-center">
-            <p className="text-sm text-muted-foreground">
-              Build your first app with assistio!
+            <p className="text-sm text-white">
+              You have no projects yet. Create one to get started!
             </p>
           </div>
         )}
@@ -26,7 +26,7 @@ export const ProjectsList = () => {
           <Button
             key={project.id}
             variant="outline"
-            className="font-normal h-auto justify-start w-full text-start p-4"
+            className="font-normal h-auto justify-start w-full text-start p-4 overflow-hidden"
             asChild
           >
             <Link href={`/projects/${project.id}`}>

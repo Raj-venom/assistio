@@ -15,6 +15,7 @@ import { CodeIcon, CrownIcon, EyeIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FileCollection, FileExplorer } from "@/components/file-explorer";
+import { UserControl } from "@/components/user-control";
 
 interface Props {
   projectId: string;
@@ -43,7 +44,7 @@ export const ProjectView = ({ projectId }: Props) => {
             />
           </Suspense>
         </ResizablePanel>
-        <ResizableHandle className="hover:bg-primary transition-colors"  />
+        <ResizableHandle className="hover:bg-primary transition-colors" />
         <ResizablePanel defaultSize={75} minSize={50}>
           <Tabs
             className="h-full gap-y-0"
@@ -66,12 +67,13 @@ export const ProjectView = ({ projectId }: Props) => {
                     <CrownIcon /> Upgrade
                   </Link>
                 </Button>
+                <UserControl />
               </div>
             </div>
             <TabsContent value="preview">
               {!!activeFragment && <FragmentWeb data={activeFragment} />}
             </TabsContent>
-            <TabsContent value="code" className="min-h-0" >
+            <TabsContent value="code" className="min-h-0">
               {!!activeFragment?.files && (
                 <FileExplorer files={activeFragment.files as FileCollection} />
               )}
