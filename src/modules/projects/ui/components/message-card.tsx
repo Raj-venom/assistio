@@ -65,7 +65,7 @@ const FragmentCard = ({
                 <span className="text-sm font-medium line-clamp-1">
                     {fragment.title}
                 </span>
-                <span className="text-xs text-muted-foreground">Preview</span>
+                <span className="text-xs ">Preview</span>
             </div>
             <ChevronRightIcon className="size-4 mt-0.5 shrink-0" />
         </Button>
