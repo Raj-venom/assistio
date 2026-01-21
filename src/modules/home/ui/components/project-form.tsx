@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { PROJECT_TEMPLATES } from "../../constant";
 import { enhancePromptWithGemini } from "@/hooks/call-llm";
+import { useClerk } from "@clerk/nextjs";
 
 const projectFormSchema = z.object({
   prompt: z
@@ -28,8 +29,10 @@ const projectFormSchema = z.object({
 
 export default function ProjectForm() {
   const router = useRouter();
+  const cleark = useClerk();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
   const form = useForm<z.infer<typeof projectFormSchema>>({
     resolver: zodResolver(projectFormSchema),
     defaultValues: {
@@ -45,6 +48,9 @@ export default function ProjectForm() {
       },
       onError: (error) => {
         toast.error(`${error.message}`);
+        if (error.data?.code === "UNAUTHORIZED") {
+          cleark.openSignIn();
+        }
       },
     }),
   );
@@ -113,14 +119,14 @@ export default function ProjectForm() {
               &nbsp;to submit
             </div>
 
-            <div className="flex items-center justify-center" >
+            <div className="flex items-center justify-center">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleInhancePrompt(form.getValues())}
                 type="button"
               >
-              ✨ Enhance
+                ✨ Enhance
               </Button>
 
               <Button

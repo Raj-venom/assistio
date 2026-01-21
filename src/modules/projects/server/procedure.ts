@@ -4,7 +4,7 @@ import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import prisma from "@/lib/db";
 import { TRPCError } from "@trpc/server";
 
-// TODO: Move to a utility file AND IMPROVE it
+// TODO: Move createTitleFromPrompt to a utility file AND IMPROVE it
 function createTitleFromPrompt(prompt: string): string {
   const words = prompt.trim().split(/\s+/);
   const titleWords = words.slice(0, 5);
@@ -22,10 +22,11 @@ export const projectsRouter = createTRPCRouter({
           .max(1000, { message: "Prompt must be at most 1000 characters" }),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const project = await prisma.project.create({
         data: {
           name: createTitleFromPrompt(input.prompt),
+          userId: ctx.auth.userId,
           messages: {
             create: {
               content: input.prompt,
@@ -44,8 +45,9 @@ export const projectsRouter = createTRPCRouter({
       return project;
     }),
 
-  getMany: protectedProcedure.query(async () => {
+  getMany: protectedProcedure.query(async ({ ctx }) => {
     const project = await prisma.project.findMany({
+      where: { userId: ctx.auth.userId },
       orderBy: { updatedAt: "desc" },
     });
     return project;
@@ -57,9 +59,9 @@ export const projectsRouter = createTRPCRouter({
         id: z.string().min(1, { message: "Project ID is required" }),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const project = await prisma.project.findUnique({
-        where: { id: input.id },
+        where: { id: input.id, userId: ctx.auth.userId },
       });
 
       if (!project) {

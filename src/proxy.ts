@@ -4,7 +4,7 @@ const isPublicRoute = createRouteMatcher([
   "/",
   "/sign-in(.*)",
   "/sign-up(.*)",
-  "/api/inngest(.*)",
+  "/api(.*)", // Allow API routes in proxy Protect it using trpc auth middleware
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
