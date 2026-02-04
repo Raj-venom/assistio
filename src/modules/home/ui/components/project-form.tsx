@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { PROJECT_TEMPLATES } from "../../constant";
 import { enhancePromptWithGemini } from "@/hooks/call-llm";
+import { useClerk } from "@clerk/nextjs";
 
 const projectFormSchema = z.object({
   prompt: z
@@ -28,8 +29,10 @@ const projectFormSchema = z.object({
 
 export default function ProjectForm() {
   const router = useRouter();
+  const cleark = useClerk();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
   const form = useForm<z.infer<typeof projectFormSchema>>({
     resolver: zodResolver(projectFormSchema),
     defaultValues: {
@@ -41,10 +44,19 @@ export default function ProjectForm() {
     trpc.projects.create.mutationOptions({
       onSuccess: (data) => {
         queryClient.invalidateQueries(trpc.projects.getMany.queryOptions());
+        queryClient.invalidateQueries(trpc.usage.status.queryOptions());
         router.push(`/projects/${data.id}`);
       },
       onError: (error) => {
         toast.error(`${error.message}`);
+        
+        if (error.data?.code === "PAYMENT_REQUIRED") {
+          router.push("/pricing");
+          return;
+        }
+        if (error.data?.code === "UNAUTHORIZED") {
+          cleark.openSignIn();
+        }
       },
     }),
   );
@@ -113,14 +125,14 @@ export default function ProjectForm() {
               &nbsp;to submit
             </div>
 
-            <div className="flex items-center justify-center" >
+            <div className="flex items-center justify-center">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleInhancePrompt(form.getValues())}
                 type="button"
               >
-              ✨ Enhance
+                ✨ Enhance
               </Button>
 
               <Button
