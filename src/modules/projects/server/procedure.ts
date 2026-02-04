@@ -3,6 +3,7 @@ import { inngest } from "@/inngest/client";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import prisma from "@/lib/db";
 import { TRPCError } from "@trpc/server";
+import { consumeCredits } from "@/lib/usage";
 
 // TODO: Move createTitleFromPrompt to a utility file AND IMPROVE it
 function createTitleFromPrompt(prompt: string): string {
@@ -41,6 +42,22 @@ export const projectsRouter = createTRPCRouter({
         name: "code-agent/run",
         data: { prompt: input.prompt, projectId: project.id },
       });
+
+      try {
+        await consumeCredits(ctx.auth.userId);
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "" + error.message || "Something went wrong",
+          });
+        } else {
+          throw new TRPCError({
+            code: "PAYMENT_REQUIRED",
+            message: "Not enough credits to perform this action.",
+          });
+        }
+      }
 
       return project;
     }),
